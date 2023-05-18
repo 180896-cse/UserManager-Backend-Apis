@@ -3,7 +3,7 @@ import path from "path";
 
 
 //reading .env file
-require('dotenv').config({ path: path.resolve(__dirname, './.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 // connection check
 
 AWS.config.update({

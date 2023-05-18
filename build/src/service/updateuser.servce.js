@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -23,42 +14,40 @@ const SECRET_KEY = "CRUDAPI";
 const userValdChk = new Auth_1.userAuth();
 // Get all user from Dynamo DB
 class updateuserService {
-    updateUser(id, username, password, toUpdateValue) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const data = { id, username, password, toUpdateValue };
-            const params = {
-                TableName: "usersDB",
-                Key: {
-                    id: data.id,
-                },
-                UpdateExpression: "SET username = :updateVal",
-                ExpressionAttributeValues: {
-                    ":updateVal": data.toUpdateValue,
-                },
-                ReturnValues: "UPDATED_NEW"
-            };
-            // console.log(params);
-            const resp = yield users_controller_1.userdbInstance.getOneUser(data.id);
-            if (resp) {
-                const isValidUser = userValdChk.userCred(data.username, resp.username, data.password, resp.password);
-                // verfication of generated token
-                const Token = jsonwebtoken_1.default.verify(resp.Token, SECRET_KEY);
-                if ((yield isValidUser) && Token) {
-                    if ((resp.role == "admin")) {
-                        return yield dynamoDB_connect_1.DynamoDB.update(params).promise();
-                    }
-                    else {
-                        console.log(`not an admin user!`);
-                    }
+    async updateUser(id, username, password, toUpdateValue) {
+        const data = { id, username, password, toUpdateValue };
+        const params = {
+            TableName: "usersDB",
+            Key: {
+                id: data.id,
+            },
+            UpdateExpression: "SET username = :updateVal",
+            ExpressionAttributeValues: {
+                ":updateVal": data.toUpdateValue,
+            },
+            ReturnValues: "UPDATED_NEW"
+        };
+        // console.log(params);
+        const resp = await users_controller_1.userdbInstance.getOneUser(data.id);
+        if (resp) {
+            const isValidUser = userValdChk.userCred(data.username, resp.username, data.password, resp.password);
+            // verfication of generated token
+            const Token = jsonwebtoken_1.default.verify(resp.Token, SECRET_KEY);
+            if ((await isValidUser) && Token) {
+                if ((resp.role == "admin")) {
+                    return await dynamoDB_connect_1.DynamoDB.update(params).promise();
                 }
                 else {
-                    console.log(`invalid cred!`);
+                    console.log(`not an admin user!`);
                 }
             }
             else {
-                console.log(`Record not Found!!`);
+                console.log(`invalid cred!`);
             }
-        });
+        }
+        else {
+            console.log(`Record not Found!!`);
+        }
     }
 }
 exports.updateuserService = updateuserService;

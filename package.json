@@ -4,7 +4,7 @@
   "description": "Registration and Login Form with ExpressJS NoSQL and JWT.",
   "main": "app.js",
   "scripts": {
-    "build": "rimraf dist && tsc",
+    "build": "rimraf build && tsc",
     "deploy": "serverless deploy",
     "start": "ts-node-dev ./src/appServer.ts",
     "test": "echo \"Error: no test specified\" && exit 1"

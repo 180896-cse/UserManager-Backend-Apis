@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -40,20 +31,20 @@ class userSchemaResolver {
                 isServerUp: () => {
                     return `Test ok!`;
                 },
-                getUsers: () => __awaiter(this, void 0, void 0, function* () {
-                    return yield exports.userdbInstance.getAllUsers();
-                }),
-                getUser: (parents, args) => __awaiter(this, void 0, void 0, function* () {
-                    return yield exports.userdbInstance.getOneUser(args.id);
-                }),
-                userLogin: (parents, args, context) => __awaiter(this, void 0, void 0, function* () {
-                    var response = yield exports.userdbInstance.getOneUser(args.id);
+                getUsers: async () => {
+                    return await exports.userdbInstance.getAllUsers();
+                },
+                getUser: async (parents, args) => {
+                    return await exports.userdbInstance.getOneUser(args.id);
+                },
+                userLogin: async (parents, args, context) => {
+                    var response = await exports.userdbInstance.getOneUser(args.id);
                     if (response) {
                         const isValidUser = userValdChk.userCred(args.username, response.username, args.password, response.password);
                         // verfication of generated token
                         const Token = jsonwebtoken_1.default.verify(response.Token, SECRET_KEY);
-                        if ((yield isValidUser) && Token) {
-                            return yield exports.userdbInstance.getAllUsers();
+                        if ((await isValidUser) && Token) {
+                            return await exports.userdbInstance.getAllUsers();
                         }
                         else {
                             console.error(`invalid Cred!!`);
@@ -62,24 +53,24 @@ class userSchemaResolver {
                     else {
                         console.log(`user not Present!!`);
                     }
-                }),
+                },
             },
             Mutation: {
-                addUser: (parents, args) => __awaiter(this, void 0, void 0, function* () {
-                    const hashedpassword = yield bcryptjs_1.default.hash(args.password, 12);
+                addUser: async (parents, args) => {
+                    const hashedpassword = await bcryptjs_1.default.hash(args.password, 12);
                     const { id, name, username, role } = args;
                     // Token generation for authirization
                     const Token = jsonwebtoken_1.default.sign({ username: username, id: id }, SECRET_KEY);
-                    const res = yield adduserInstance.addUser(id, name, username, hashedpassword, Token, role);
+                    const res = await adduserInstance.addUser(id, name, username, hashedpassword, Token, role);
                     return { success: true };
-                }),
-                updateUser: (parents, args) => __awaiter(this, void 0, void 0, function* () {
+                },
+                updateUser: async (parents, args) => {
                     const { id, username, password, toUpdateValue } = args;
-                    return yield updateuserInstance.updateUser(id, username, password, toUpdateValue);
-                }),
-                deleteUser: (parents, args) => __awaiter(this, void 0, void 0, function* () {
-                    return yield deleteuserInstance.deleteOneUser(args.id, args.username, args.password, args.tobeDeleteId);
-                }),
+                    return await updateuserInstance.updateUser(id, username, password, toUpdateValue);
+                },
+                deleteUser: async (parents, args) => {
+                    return await deleteuserInstance.deleteOneUser(args.id, args.username, args.password, args.tobeDeleteId);
+                },
             },
         };
         return resolvers;

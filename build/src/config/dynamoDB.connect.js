@@ -7,7 +7,7 @@ exports.DynamoDB = exports.Table = void 0;
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const path_1 = __importDefault(require("path"));
 //reading .env file
-require('dotenv').config({ path: path_1.default.resolve(__dirname, './.env') });
+require('dotenv').config({ path: path_1.default.resolve(__dirname, '../.env') });
 // connection check
 aws_sdk_1.default.config.update({
     accessKeyId: process.env.accessKeyId,

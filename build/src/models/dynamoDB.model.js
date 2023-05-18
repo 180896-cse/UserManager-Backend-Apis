@@ -11,7 +11,7 @@ class dbSchema {
         password: String!
         role:String!
       }
-      
+     
       type Query {
         isServerUp: String
         getUsers: [User]
